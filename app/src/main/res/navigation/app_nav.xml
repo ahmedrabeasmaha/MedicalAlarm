@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_nav"
+    app:startDestination="@id/homeScreen">
+
+    <fragment
+        android:id="@+id/homeScreen"
+        android:name="com.example.medicinealarm.HomeScreen"
+        android:label="fragment_home_screen"
+        tools:layout="@layout/fragment_home_screen" >
+        <action
+            android:id="@+id/action_homeScreen_to_addMedicine"
+            app:destination="@id/addMedicine" />
+    </fragment>
+    <fragment
+        android:id="@+id/addMedicine"
+        android:name="com.example.medicinealarm.AddMedicine"
+        android:label="fragment_add_medicine"
+        tools:layout="@layout/fragment_add_medicine" />
+</navigation>

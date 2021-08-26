@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Medicine Alarm</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="addButton">ADD</string>
+    <string name="add">ADD</string>
+    <string name="medicine_name">Medicine name</string>
+    <string name="select_image">Select Image</string>
+    <string name="medicine_image_preview">Medicine image preview</string>
+    <string name="select_days">Select days</string>
+    <string name="number_of_pills_in_all_days_is_equal">number of pills in all days is equal?</string>
+</resources>

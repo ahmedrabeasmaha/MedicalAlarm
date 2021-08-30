@@ -18,5 +18,9 @@
         android:id="@+id/addMedicine"
         android:name="com.example.medicinealarm.AddMedicine"
         android:label="fragment_add_medicine"
-        tools:layout="@layout/fragment_add_medicine" />
+        tools:layout="@layout/fragment_add_medicine" >
+        <action
+            android:id="@+id/action_addMedicine_to_homeScreen"
+            app:destination="@id/homeScreen" />
+    </fragment>
 </navigation>

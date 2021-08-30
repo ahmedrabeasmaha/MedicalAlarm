@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Medicine Alarm</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="addButton">ADD</string>
     <string name="add">ADD</string>
     <string name="medicine_name">Medicine name</string>
@@ -9,4 +8,23 @@
     <string name="medicine_image_preview">Medicine image preview</string>
     <string name="select_days">Select days</string>
     <string name="number_of_pills_in_all_days_is_equal">number of pills in all days is equal?</string>
+    <string name="all_pills">all pills in same time?</string>
+    <string name="pills_num">Enter number of pills</string>
+    <string name="day">day</string>
+    <string name="pill">pill no.</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+    <string name="Saturday">Saturday</string>
+    <string name="Sunday">Sunday</string>
+    <string name="Monday">Monday</string>
+    <string name="Tuesday">Tuesday</string>
+    <string name="Wednesday">Wednesday</string>
+    <string name="Thursday">Thursday</string>
+    <string name="Friday">Friday</string>
+    <string name="pill_time">Enter Time of pill no.</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="medicine_name_error">Please enter medicine name</string>
+    <string name="select_days_error">Please select medicine days</string>
+    <string name="pill_error">Please enter no. of pills</string>
 </resources>

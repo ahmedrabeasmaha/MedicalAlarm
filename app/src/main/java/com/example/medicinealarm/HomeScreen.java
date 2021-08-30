@@ -1,10 +1,16 @@
 package com.example.medicinealarm;
 
+import android.annotation.SuppressLint;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
+import androidx.work.Data;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +18,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,14 +26,6 @@ public class HomeScreen extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-//    String[] listviewTitle = new String[]{
-//            "ListView Title 1", "ListView Title 2", "ListView Title 3", "ListView Title 4",
-//            "ListView Title 5", "ListView Title 6", "ListView Title 7", "ListView Title 8",
-//    };
-//    int[] listviewImage = new int[]{
-//            R.drawable.index, R.drawable.index, R.drawable.index, R.drawable.index,
-//            R.drawable.index, R.drawable.index, R.drawable.index, R.drawable.index,
-//    };
 
     private String mParam1;
     private String mParam2;
@@ -46,6 +45,7 @@ public class HomeScreen extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -56,18 +56,32 @@ public class HomeScreen extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home_screen, container, false);
-//        List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-//        for (int i = 0; i < 8; i++) {
-//            HashMap<String, String> hm = new HashMap<String, String>();
-//            hm.put("listview_title", listviewTitle[i]);
-//            hm.put("listview_image", Integer.toString(listviewImage[i]));
-//            aList.add(hm);
-//        }
-//        String[] from = {"listview_image", "listview_title"};
-//        int[] to = {R.id.listview_image, R.id.listview_item_title};
-//        SimpleAdapter simpleAdapter = new SimpleAdapter(getActivity(), aList, R.layout.listviewactivty, from, to);
-//        ListView listView = (ListView) view.findViewById(R.id.listView1);
-//        listView.setAdapter(simpleAdapter);
+        myDbAdapter helper = new myDbAdapter(getContext());
+        Cursor cursor = helper.getData();
+        ListView listView = view.findViewById(R.id.listView1);
+        List<Model> list = new ArrayList<>();
+        try {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("medicine_name"));
+                    int index = cursor.getColumnIndexOrThrow("image");
+                    byte[] imgByte = cursor.getBlob(index);
+                    Bitmap bm;
+                    if (imgByte == null) {
+                        bm = BitmapFactory.decodeResource(getResources(), R.drawable.medicine);
+                    }
+                    else {
+                        bm = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+                    }
+
+                    list.add(new Model(name, bm));
+                    cursor.moveToNext();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        myAdapter adapter = new myAdapter(getActivity(), list);
+        listView.setAdapter(adapter);
         return view;
     }
 }

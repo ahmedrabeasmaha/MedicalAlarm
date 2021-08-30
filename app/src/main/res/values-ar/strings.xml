@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">منبة الدواء</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="addButton">اضافه</string>
+    <string name="add">اضافه</string>
+    <string name="medicine_name">اسم الدواء</string>
+    <string name="select_image">اختر صوره</string>
+    <string name="medicine_image_preview">صورة الدواء</string>
+    <string name="select_days">اختر الايام</string>
+    <string name="number_of_pills_in_all_days_is_equal">عدد الحبوب متساوي في كل الايام؟</string>
+    <string name="all_pills">جميع الحبوب في وقت واحد؟</string>
+    <string name="pills_num">ادخل عدد الحبوب</string>
+    <string name="day">يوم</string>
+    <string name="Saturday">السبت</string>
+    <string name="Sunday">الاحد</string>
+    <string name="Monday">الاثنين</string>
+    <string name="Tuesday">الثلاثاء</string>
+    <string name="Wednesday">الاربعاء</string>
+    <string name="Thursday">الخميس</string>
+    <string name="Friday">الجمعه</string>
+    <string name="pill_time">ادخل وقت حبة الدواء رقم</string>
+    <string name="pill">حبة الدواء رقم</string>
+    <string name="am">صباحا</string>
+    <string name="pm">مساءا</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">الغاء</string>
+    <string name="medicine_name_error">من فضلك ادخل اسم الدواء</string>
+    <string name="select_days_error">من فضلك اختر عدد ايام الدواء</string>
+    <string name="pill_error">من فضلك ادخل عدد الحبوب</string>
+</resources>

@@ -125,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
                                         helper.insertMedicineTime(separated[0], separated[1], days_string[j]);
                                     }
                                     else {
-                                        helper.insertMedicineTime(separated[0], separated[1], days_string[j]);
+                                        String hours = String.valueOf(Integer.parseInt(separated[0] + 12));
+                                        helper.insertMedicineTime(hours, separated[1], days_string[j]);
                                     }
                                 }
                             }
@@ -175,20 +176,15 @@ public class MainActivity extends AppCompatActivity {
                                 Button button = (Button) constraint.getChildAt(i);
                                 String bu_text = (String) button.getText();
                                 String[] separated = bu_text.split(" ");
-                                if (separated[separated.length - 1] == getText(R.string.am)) {
-                                    String days_string = separated[3];
-                                    System.out.println(days_string);
-                                    String st = separated[separated.length - 2];
-                                    separated = st.split(":");
+                                String days_string = separated[2];
+                                String am_pm = separated[separated.length - 1];
+                                String time = separated[separated.length - 2];
+                                separated = time.split(":");
+                                if (am_pm == getText(R.string.am)) {
                                     helper.insertMedicineTime(separated[0], separated[1], days_string);
                                 } else {
-                                    String days_string = separated[3];
-                                    System.out.println(days_string);
-                                    String st = separated[separated.length - 2];
-                                    separated = st.split(":");
-                                    int ho = Integer.parseInt(separated[0]) + 12;
-                                    separated[0] = String.valueOf(ho);
-                                    helper.insertMedicineTime(separated[0], separated[1], days_string);
+                                    String hours = String.valueOf(Integer.parseInt(separated[0] + 12));
+                                    helper.insertMedicineTime(hours, separated[1], days_string);
                                 }
                             }
                             Navigation.findNavController(view).navigate(R.id.homeScreen);
@@ -290,8 +286,6 @@ public class MainActivity extends AppCompatActivity {
         });
         editText.setTag(tag);
         editText.setHint(hint);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(1000, ViewGroup.LayoutParams.WRAP_CONTENT);
-        editText.setLayoutParams(params);
         constraint.addView(editText);
         cs.clone(constraint);
         cs.connect(editText.getId(), ConstraintSet.TOP, view.getId(), ConstraintSet.BOTTOM, 44);
@@ -389,8 +383,6 @@ public class MainActivity extends AppCompatActivity {
         editText.setTag(tag);
         String s = getString(hint) + " " + getString(hint2);
         editText.setHint(s);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(1000, ViewGroup.LayoutParams.WRAP_CONTENT);
-        editText.setLayoutParams(params);
         constraint.addView(editText);
         cs.clone(constraint);
         cs.connect(editText.getId(), ConstraintSet.TOP, view.getId(), ConstraintSet.BOTTOM, 44);

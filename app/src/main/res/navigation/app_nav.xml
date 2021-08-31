@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_nav"
-    app:startDestination="@id/homeScreen">
+    app:startDestination="@id/intro">
 
     <fragment
         android:id="@+id/homeScreen"
@@ -21,6 +21,15 @@
         tools:layout="@layout/fragment_add_medicine" >
         <action
             android:id="@+id/action_addMedicine_to_homeScreen"
+            app:destination="@id/homeScreen" />
+    </fragment>
+    <fragment
+        android:id="@+id/intro"
+        android:name="com.example.medicinealarm.Intro"
+        android:label="fragment_intro"
+        tools:layout="@layout/fragment_intro" >
+        <action
+            android:id="@+id/action_intro_to_homeScreen"
             app:destination="@id/homeScreen" />
     </fragment>
 </navigation>

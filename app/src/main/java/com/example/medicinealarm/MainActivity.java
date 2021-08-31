@@ -1,8 +1,6 @@
 package com.example.medicinealarm;
 
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +12,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -31,8 +26,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
@@ -49,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     byte[] data;
     ActivityResultLauncher<Intent> activityResultLauncher;
     myDbAdapter helper;
+    LocalData localData;
 
 
     @Override
@@ -56,22 +50,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         helper = new myDbAdapter(this);
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-            @Override
-            public void onActivityResult(ActivityResult result) {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Bundle bundle = result.getData().getExtras();
-                    Bitmap bitmap = (Bitmap) bundle.get("data");
-                    ImageView image = findViewById(R.id.imageView);
-                    image.setImageBitmap(bitmap);
-                }
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Bundle bundle = result.getData().getExtras();
+                Bitmap bitmap = (Bitmap) bundle.get("data");
+                ImageView image = findViewById(R.id.imageView);
+                image.setImageBitmap(bitmap);
             }
         });
+        localData = new LocalData(getApplicationContext());
     }
 
     public void onClick(View view) {
         setTitle("Add medicine");
         Navigation.findNavController(view).navigate(R.id.addMedicine);
+    }
+
+    public void skipIntro(View view) {
+        setTitle("Medicine Alarm");
+        Navigation.findNavController(view).navigate(R.id.homeScreen);
     }
 
     public void goBack(View view) {
@@ -85,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
         TextInputEditText text = findViewById(R.id.textInputEditText);
         SwitchMaterial sw = findViewById(R.id.switch1);
         ImageView image = findViewById(R.id.imageView);
+//        localData.set_hour(2);
+//        localData.set_min(52);
+//        NotificationScheduler.setReminder(MainActivity.this, AlarmReceiver.class, localData.get_hour(), localData.get_min());
         if (Objects.requireNonNull(text.getText()).length() > 0) {
             if (sw.isChecked()) {
                 int days = 0;
@@ -95,56 +95,46 @@ public class MainActivity extends AppCompatActivity {
                 }
                 ConstraintLayout constraint = findViewById(R.id.con);
                 if (days != 0) {
-                    EditText count = (EditText) constraint.getChildAt(5);
-                    if (count.getText().length() > 0) {
+                    EditText editText = (EditText) constraint.getChildAt(5);
+                    if (editText.getText().length() > 0) {
                         boolean go = true;
-                        int num = Integer.parseInt(String.valueOf(count.getText()));
+                        int num = Integer.parseInt(String.valueOf(editText.getText()));
                         for (int i = 6; i < num + 6; i++) {
-                            Button count1 = (Button) constraint.getChildAt(i);
-                            String textb = (String) count1.getText();
-                            if (!textb.contains(":")) {
+                            Button button = (Button) constraint.getChildAt(i);
+                            String bu_text = (String) button.getText();
+                            if (!bu_text.contains(":")) {
                                 go = false;
-                                count1.setError(getText(R.string.pill_error));
+                                button.setError(getText(R.string.pill_error));
                             }
                         }
                         if (go) {
                             Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
                             data = getBitmapAsByteArray(bitmap);
                             helper.insertMedicine(text.getText().toString(), data, true);
-                            num = Integer.parseInt(String.valueOf(count.getText()));
+                            num = Integer.parseInt(String.valueOf(editText.getText()));
                             for (int i = 6; i < num + 6; i++) {
-                                Button count1 = (Button) constraint.getChildAt(i);
-                                String textb = (String) count1.getText();
-                                String[] separated = textb.split(" ");
-                                if (separated[separated.length - 1] == getText(R.string.am)) {
-                                    String[] daysod = {getString(R.string.Saturday), getString(R.string.Sunday), getString(R.string.Monday), getString(R.string.Tuesday), getString(R.string.Wednesday), getString(R.string.Thursday), getString(R.string.Friday)};
-                                    String st = separated[separated.length - 2];
-                                    separated = st.split(":");
-                                    for (int j = 0; j < 7; j++) {
-                                        if (checkedDays[j]) {
-                                            helper.insertMedicineTime(separated[0].toString(), separated[1].toString(), daysod[j]);
-                                        }
+                                Button button = (Button) constraint.getChildAt(i);
+                                String bu_text = (String) button.getText();
+                                String[] separated = bu_text.split(" ");
+                                String[] days_string = {getString(R.string.Saturday), getString(R.string.Sunday), getString(R.string.Monday), getString(R.string.Tuesday), getString(R.string.Wednesday), getString(R.string.Thursday), getString(R.string.Friday)};
+                                String am_pm = separated[separated.length - 2];
+                                String st = separated[separated.length - 2];
+                                separated = st.split(":");
+                                for (int j = 0; j < 7; j++) {
+                                    if (checkedDays[j] && am_pm == getText(R.string.pm)) {
+                                        helper.insertMedicineTime(separated[0], separated[1], days_string[j]);
                                     }
-                                } else {
-                                    String[] daysod = {getString(R.string.Saturday), getString(R.string.Sunday), getString(R.string.Monday), getString(R.string.Tuesday), getString(R.string.Wednesday), getString(R.string.Thursday), getString(R.string.Friday)};
-                                    String st = separated[separated.length - 2];
-                                    separated = st.split(":");
-                                    int ho = Integer.parseInt(separated[0]) + 12;
-                                    separated[0] = String.valueOf(ho);
-                                    for (int j = 0; j < 7; j++) {
-                                        if (checkedDays[j]) {
-                                            helper.insertMedicineTime(separated[0].toString(), separated[1].toString(), daysod[j]);
-                                        }
+                                    else {
+                                        helper.insertMedicineTime(separated[0], separated[1], days_string[j]);
                                     }
                                 }
                             }
                             Navigation.findNavController(view).navigate(R.id.homeScreen);
                         }
                     } else {
-                        count.setError(getText(R.string.pill_error));
+                        editText.setError(getText(R.string.pill_error));
                     }
-                }
-                else {
+                } else {
                     Button count = (Button) constraint.getChildAt(3);
                     count.setError(getText(R.string.select_days_error));
                 }
@@ -170,11 +160,11 @@ public class MainActivity extends AppCompatActivity {
                     if (go) {
                         ConstraintLayout constraint = findViewById(R.id.con);
                         for (int i = 5 + days; i < sum + days + 5; i++) {
-                            Button count = (Button) constraint.getChildAt(i);
-                            String textb = (String) count.getText();
-                            if (!textb.contains(":")) {
+                            Button button = (Button) constraint.getChildAt(i);
+                            String bu_text = (String) button.getText();
+                            if (!bu_text.contains(":")) {
                                 go = false;
-                                count.setError(getText(R.string.pill_error));
+                                button.setError(getText(R.string.pill_error));
                             }
                         }
                         if (go) {
@@ -182,23 +172,23 @@ public class MainActivity extends AppCompatActivity {
                             data = getBitmapAsByteArray(bitmap);
                             helper.insertMedicine(text.getText().toString(), data, false);
                             for (int i = 5 + days; i < sum + days + 5; i++) {
-                                Button count1 = (Button) constraint.getChildAt(i);
-                                String textb = (String) count1.getText();
-                                String[] separated = textb.split(" ");
+                                Button button = (Button) constraint.getChildAt(i);
+                                String bu_text = (String) button.getText();
+                                String[] separated = bu_text.split(" ");
                                 if (separated[separated.length - 1] == getText(R.string.am)) {
-                                    String daysod = separated[3];
-                                    System.out.println(daysod);
+                                    String days_string = separated[3];
+                                    System.out.println(days_string);
                                     String st = separated[separated.length - 2];
                                     separated = st.split(":");
-                                    helper.insertMedicineTime(separated[0].toString(), separated[1].toString(), daysod);
+                                    helper.insertMedicineTime(separated[0], separated[1], days_string);
                                 } else {
-                                    String daysod = separated[3];
-                                    System.out.println(daysod);
+                                    String days_string = separated[3];
+                                    System.out.println(days_string);
                                     String st = separated[separated.length - 2];
                                     separated = st.split(":");
                                     int ho = Integer.parseInt(separated[0]) + 12;
                                     separated[0] = String.valueOf(ho);
-                                    helper.insertMedicineTime(separated[0].toString(), separated[1].toString(), daysod);
+                                    helper.insertMedicineTime(separated[0], separated[1], days_string);
                                 }
                             }
                             Navigation.findNavController(view).navigate(R.id.homeScreen);
@@ -210,8 +200,7 @@ public class MainActivity extends AppCompatActivity {
                     count.setError(getText(R.string.select_days_error));
                 }
             }
-        }
-        else {
+        } else {
             text.setError(getText(R.string.medicine_name_error));
         }
     }
@@ -280,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
                             }, hour, minute, false);//Yes 24 hour time
                             mTimePicker.setTitle("Select Time");
                             mTimePicker.show();
-
                         });
                         constraint = findViewById(R.id.con);
                         count = constraint.getChildCount();
@@ -362,20 +350,17 @@ public class MainActivity extends AppCompatActivity {
                         button.setText(getString(R.string.pill_time) + " " + i + " " + getString(R.string.day) + " " + getString(hint2));
                         int finalI = i;
                         button.setOnClickListener(v -> {
-                            Calendar mcurrentTime = Calendar.getInstance();
-                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                            int minute = mcurrentTime.get(Calendar.MINUTE);
+                            Calendar currentTime = Calendar.getInstance();
+                            int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                            int minute = currentTime.get(Calendar.MINUTE);
                             TimePickerDialog mTimePicker;
-                            mTimePicker = new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                                @Override
-                                public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                                    if (selectedHour > 12) {
-                                        button.setText(getString(R.string.pill) + " " + finalI + " " + getString(hint2) + " " + (selectedHour - 12) + ":" + selectedMinute + " " + getString(R.string.pm));
-                                    } else {
-                                        button.setText(getString(R.string.pill) + " " + finalI + " " + getString(hint2) + " " + selectedHour + ":" + selectedMinute + " " + getString(R.string.am));
-                                    }
-
+                            mTimePicker = new TimePickerDialog(MainActivity.this, (timePicker, selectedHour, selectedMinute) -> {
+                                if (selectedHour > 12) {
+                                    button.setText(getString(R.string.pill) + " " + finalI + " " + getString(hint2) + " " + (selectedHour - 12) + ":" + selectedMinute + " " + getString(R.string.pm));
+                                } else {
+                                    button.setText(getString(R.string.pill) + " " + finalI + " " + getString(hint2) + " " + selectedHour + ":" + selectedMinute + " " + getString(R.string.am));
                                 }
+
                             }, hour, minute, false);
                             mTimePicker.setTitle("Select Time");
                             mTimePicker.show();

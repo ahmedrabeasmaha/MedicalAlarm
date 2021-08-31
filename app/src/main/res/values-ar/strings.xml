@@ -27,4 +27,6 @@
     <string name="medicine_name_error">من فضلك ادخل اسم الدواء</string>
     <string name="select_days_error">من فضلك اختر عدد ايام الدواء</string>
     <string name="pill_error">من فضلك ادخل عدد الحبوب</string>
+    <string name="intro">اتبع تعليمات وجرعات الدواء التى حددها الطبيب بعناية</string>
+    <string name="go">انهاء</string>
 </resources>

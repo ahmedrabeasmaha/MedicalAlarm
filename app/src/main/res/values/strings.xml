@@ -27,4 +27,7 @@
     <string name="medicine_name_error">Please enter medicine name</string>
     <string name="select_days_error">Please select medicine days</string>
     <string name="pill_error">Please enter no. of pills</string>
+    <string name="intro">Carefully follow the medication instructions and dosage prescribed by the doctor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="go">Go</string>
 </resources>

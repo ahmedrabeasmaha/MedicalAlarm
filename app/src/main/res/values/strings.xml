@@ -29,5 +29,24 @@
     <string name="pill_error">Please enter no. of pills</string>
     <string name="intro">Carefully follow the medication instructions and dosage prescribed by the doctor</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="go">Go</string>
+    <string name="go">Continue</string>
+    <string name="delete">Are you sure you want to delete this medicine</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string-array name="whale_array">
+        <item>Pick a whale sound!</item>
+        <item>Humpback bubble net</item>
+        <item>Humpback contact Call Moo</item>
+        <item>Humpback contact Call Whup</item>
+        <item>Humpback feeding Call</item>
+        <item>Humpback flipper splash</item>
+        <item>Humpback Tail slaps</item>
+        <item>Humpback whale song</item>
+        <item>Humpback whale song with outboard engine</item>
+        <item>Humpback wheeze blows</item>
+        <item>Killer whale echolocation clicks</item>
+        <item>Killer whale offshore</item>
+        <item>Killer whale resident</item>
+        <item>Killer whale transient</item>
+    </string-array>
 </resources>

@@ -29,7 +29,7 @@
         android:label="fragment_intro"
         tools:layout="@layout/fragment_intro" >
         <action
-            android:id="@+id/action_intro_to_homeScreen"
-            app:destination="@id/homeScreen" />
+            android:id="@+id/action_intro_to_addMedicine"
+            app:destination="@id/addMedicine" />
     </fragment>
 </navigation>

@@ -4,10 +4,12 @@ import android.graphics.Bitmap;
 
 public class Model {
     private String name;
+    private String tag;
     private Bitmap image;
 
-    public Model(String name, Bitmap image) {
+    public Model(String name, String tag, Bitmap image) {
         this.name = name;
+        this.tag = tag;
         this.image = image;
     }
 
@@ -17,6 +19,10 @@ public class Model {
 
     public Bitmap getImage() {
         return image;
+    }
+
+    public String  getTag() {
+        return tag;
     }
 
 }

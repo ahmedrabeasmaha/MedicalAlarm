@@ -28,5 +28,24 @@
     <string name="select_days_error">من فضلك اختر عدد ايام الدواء</string>
     <string name="pill_error">من فضلك ادخل عدد الحبوب</string>
     <string name="intro">اتبع تعليمات وجرعات الدواء التى حددها الطبيب بعناية</string>
-    <string name="go">انهاء</string>
+    <string name="go">متابعه</string>
+    <string name="delete">هل تريد حذف هذا الدواء</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string-array name="whale_array">
+        <item>Pick a whale sound!</item>
+        <item>Humpback bubble net</item>
+        <item>Humpback contact Call Moo</item>
+        <item>Humpback contact Call Whup</item>
+        <item>Humpback feeding Call</item>
+        <item>Humpback flipper splash</item>
+        <item>Humpback Tail slaps</item>
+        <item>Humpback whale song</item>
+        <item>Humpback whale song with outboard engine</item>
+        <item>Humpback wheeze blows</item>
+        <item>Killer whale echolocation clicks</item>
+        <item>Killer whale offshore</item>
+        <item>Killer whale resident</item>
+        <item>Killer whale transient</item>
+    </string-array>
 </resources>

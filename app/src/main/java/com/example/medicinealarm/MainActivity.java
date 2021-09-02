@@ -3,34 +3,48 @@ package com.example.medicinealarm;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.view.ContentInfoCompat;
 import androidx.navigation.Navigation;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -44,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     myDbAdapter helper;
     LocalData localData;
 
-
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipIntro(View view) {
         setTitle("Medicine Alarm");
-        Navigation.findNavController(view).navigate(R.id.homeScreen);
+        Navigation.findNavController(view).navigate(R.id.addMedicine);
     }
 
     public void goBack(View view) {
@@ -221,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         editText.setMaxLines(1);
         editText.setLines(1);
-        editText.setHintTextColor(Color.argb(255, 82, 82, 82));
+        editText.setHintTextColor(Color.rgb(185, 185, 185));
         editText.setTextColor(Color.WHITE);
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setSingleLine(true);
@@ -247,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
                         Button button = new Button(getApplicationContext());
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + i);
+                        button.setBackgroundColor(Color.rgb(90, 90, 92));
+                        button.setTextColor(Color.rgb(255, 255, 255));
+                        button.setPadding(40, 0, 40, 0);
                         button.setText(getString(R.string.pill_time) + " " + i);
                         int finalI = i;
                         button.setOnClickListener(v -> {
@@ -302,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         editText.setMaxLines(1);
         editText.setLines(1);
-        editText.setHintTextColor(Color.argb(255, 82, 82, 82));
+        editText.setHintTextColor(Color.rgb(185, 185, 185));
         editText.setTextColor(Color.WHITE);
         editText.addTextChangedListener(new TextWatcher() {
 
@@ -341,6 +358,8 @@ public class MainActivity extends AppCompatActivity {
                         Button button = new Button(getApplicationContext());
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + "n" + getString(hint2) + i);
+                        button.setBackgroundColor(Color.rgb(90, 90, 92));
+                        button.setTextColor(Color.rgb(255, 255, 255));
                         button.setText(getString(R.string.pill_time) + " " + i + " " + getString(R.string.day) + " " + getString(hint2));
                         int finalI = i;
                         button.setOnClickListener(v -> {

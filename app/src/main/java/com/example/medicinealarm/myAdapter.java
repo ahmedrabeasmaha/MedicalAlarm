@@ -1,5 +1,6 @@
 package com.example.medicinealarm;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ public class myAdapter extends ArrayAdapter<Model> {
 
     }
 
+    @SuppressLint("ViewHolder")
     public View getView(int position, View convertView, ViewGroup parent) {
         Model current = getItem(position);
         ViewHolder viewHolder = new ViewHolder();
@@ -28,6 +30,7 @@ public class myAdapter extends ArrayAdapter<Model> {
         viewHolder.image = convertView.findViewById(R.id.listview_image);
         convertView.setTag(viewHolder);
         viewHolder.text.setText(current.getName());
+        viewHolder.text.setTag(current.getTag());
         viewHolder.image.setImageBitmap(current.getImage());
         return convertView;
     }

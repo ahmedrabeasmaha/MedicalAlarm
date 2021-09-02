@@ -88,7 +88,7 @@ public class myDbAdapter extends SQLiteOpenHelper {
 
     public Integer deleteContact(Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("contacts",
+        return db.delete("medicine",
                 "id = ? ",
                 new String[]{Integer.toString(id)});
     }

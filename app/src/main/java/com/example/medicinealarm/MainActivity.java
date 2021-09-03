@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> activityResultLauncher;
     myDbAdapter helper;
     LocalData localData;
+    private Calendar mCalendar;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -73,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         localData = new LocalData(getApplicationContext());
+        mCalendar = Calendar.getInstance();
+        mCalendar.set(Calendar.MONTH, 9);
+        mCalendar.set(Calendar.YEAR, 2021);
+        mCalendar.set(Calendar.DAY_OF_MONTH, 3);
+        mCalendar.set(Calendar.HOUR_OF_DAY, 5);
+        mCalendar.set(Calendar.MINUTE, 37);
+        mCalendar.set(Calendar.SECOND, 0);
+
+        long selectedTimestamp =  mCalendar.getTimeInMillis();
+        new AlarmScheduler().setAlarm(getApplicationContext(), selectedTimestamp);
     }
 
     public void onClick(View view) {
@@ -236,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setMaxLines(1);
         editText.setLines(1);
         editText.setHintTextColor(Color.rgb(185, 185, 185));
-        editText.setTextColor(Color.WHITE);
+        editText.setTextColor(Color.BLACK);
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setSingleLine(true);
         editText.addTextChangedListener(new TextWatcher() {
@@ -262,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + i);
                         button.setBackgroundColor(Color.rgb(90, 90, 92));
-                        button.setTextColor(Color.rgb(255, 255, 255));
+                        button.setTextColor(Color.BLACK);
                         button.setPadding(40, 0, 40, 0);
                         button.setText(getString(R.string.pill_time) + " " + i);
                         int finalI = i;
@@ -320,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setMaxLines(1);
         editText.setLines(1);
         editText.setHintTextColor(Color.rgb(185, 185, 185));
-        editText.setTextColor(Color.WHITE);
+        editText.setTextColor(Color.BLACK);
         editText.addTextChangedListener(new TextWatcher() {
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -359,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + "n" + getString(hint2) + i);
                         button.setBackgroundColor(Color.rgb(90, 90, 92));
-                        button.setTextColor(Color.rgb(255, 255, 255));
+                        button.setTextColor(Color.BLACK);
                         button.setText(getString(R.string.pill_time) + " " + i + " " + getString(R.string.day) + " " + getString(hint2));
                         int finalI = i;
                         button.setOnClickListener(v -> {

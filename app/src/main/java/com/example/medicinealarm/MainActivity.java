@@ -1,14 +1,10 @@
 package com.example.medicinealarm;
 
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.view.ContentInfoCompat;
 import androidx.navigation.Navigation;
 
 import android.annotation.SuppressLint;
@@ -16,51 +12,44 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
-import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-
-
     int[] daysString = {R.string.Saturday, R.string.Sunday, R.string.Monday, R.string.Tuesday, R.string.Wednesday, R.string.Thursday, R.string.Friday};
     boolean[] checkedDays = {false, false, false, false, false, false, false};
     byte[] data;
     ActivityResultLauncher<Intent> activityResultLauncher;
     myDbAdapter helper;
-    LocalData localData;
-    private Calendar mCalendar;
+    PendingIntent pendingIntent;
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,32 +63,22 @@ public class MainActivity extends AppCompatActivity {
                 image.setImageBitmap(bitmap);
             }
         });
-        localData = new LocalData(getApplicationContext());
-        mCalendar = Calendar.getInstance();
-        mCalendar.set(Calendar.MONTH, 9);
-        mCalendar.set(Calendar.YEAR, 2021);
-        mCalendar.set(Calendar.DAY_OF_MONTH, 3);
-        mCalendar.set(Calendar.HOUR_OF_DAY, 5);
-        mCalendar.set(Calendar.MINUTE, 37);
-        mCalendar.set(Calendar.SECOND, 0);
-
-        long selectedTimestamp =  mCalendar.getTimeInMillis();
-        new AlarmScheduler().setAlarm(getApplicationContext(), selectedTimestamp);
     }
+
 
     public void onClick(View view) {
         setTitle("Add medicine");
-        Navigation.findNavController(view).navigate(R.id.addMedicine);
+        Navigation.findNavController(view).navigate(R.id.add_medicine);
     }
 
     public void skipIntro(View view) {
         setTitle("Medicine Alarm");
-        Navigation.findNavController(view).navigate(R.id.addMedicine);
+        Navigation.findNavController(view).navigate(R.id.add_medicine);
     }
 
     public void goBack(View view) {
         setTitle("Medicine Alarm");
-        Navigation.findNavController(view).navigate(R.id.homeScreen);
+        Navigation.findNavController(view).navigate(R.id.medicine_list);
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -108,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
         TextInputEditText text = findViewById(R.id.textInputEditText);
         SwitchMaterial sw = findViewById(R.id.switch1);
         ImageView image = findViewById(R.id.imageView);
-//        localData.set_hour(2);
-//        localData.set_min(52);
-//        NotificationScheduler.setReminder(MainActivity.this, AlarmReceiver.class, localData.get_hour(), localData.get_min());
         if (Objects.requireNonNull(text.getText()).length() > 0) {
             if (sw.isChecked()) {
                 int days = 0;
@@ -147,16 +123,56 @@ public class MainActivity extends AppCompatActivity {
                                 String st = separated[separated.length - 2];
                                 separated = st.split(":");
                                 for (int j = 0; j < 7; j++) {
-                                    if (checkedDays[j] && am_pm == getText(R.string.pm)) {
+                                    if (checkedDays[j] && am_pm == getText(R.string.am)) {
                                         helper.insertMedicineTime(separated[0], separated[1], days_string[j]);
+                                        long time;
+                                        Calendar calendar = Calendar.getInstance();
+                                        if (j == 0) {
+                                            calendar.set(Calendar.DAY_OF_WEEK, 7);
+                                        }
+                                        else {
+                                            calendar.set(Calendar.DAY_OF_WEEK, j);
+                                        }
+
+                                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(separated[0]));
+                                        calendar.set(Calendar.MINUTE, Integer.parseInt(separated[1]));
+                                        Intent intent = new Intent(this, AlarmReceiver.class);
+                                        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                                        time = (calendar.getTimeInMillis() - (calendar.getTimeInMillis() % 60000));
+
+                                        long selectedTimestamp =  time;
+                                        Cursor cursor = helper.getLast();
+                                        cursor.moveToLast();
+                                        int index = cursor.getColumnIndex("id");
+                                        new AlarmScheduler().setRepeatAlarm(getApplicationContext(), selectedTimestamp, AlarmManager.INTERVAL_DAY * 7);
                                     }
-                                    else {
-                                        String hours = String.valueOf(Integer.parseInt(separated[0] + 12));
+                                    else if (checkedDays[j]) {
+                                        int hu = Integer.parseInt(separated[0]) + 12;
+                                        String hours = String.valueOf(hu);
                                         helper.insertMedicineTime(hours, separated[1], days_string[j]);
+                                        long time;
+                                        Calendar calendar = Calendar.getInstance();
+                                        if (j == 0) {
+                                            calendar.set(Calendar.DAY_OF_WEEK, 7);
+                                        }
+                                        else {
+                                            calendar.set(Calendar.DAY_OF_WEEK, j);
+                                        }
+                                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hours));
+                                        calendar.set(Calendar.MINUTE, Integer.parseInt(separated[1]));
+                                        Intent intent = new Intent(this, AlarmReceiver.class);
+                                        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                                        time = (calendar.getTimeInMillis() - (calendar.getTimeInMillis() % 60000));
+                                        long selectedTimestamp =  time;
+                                        Cursor cursor = helper.getLast();
+                                        cursor.moveToLast();
+                                        int index = cursor.getColumnIndex("id");
+                                        int x = cursor.getInt(index);
+                                        new AlarmScheduler().setRepeatAlarm(getApplicationContext(), selectedTimestamp, AlarmManager.INTERVAL_DAY * 7);
                                     }
                                 }
                             }
-                            Navigation.findNavController(view).navigate(R.id.homeScreen);
+                            Navigation.findNavController(view).navigate(R.id.medicine_list);
                         }
                     } else {
                         editText.setError(getText(R.string.pill_error));
@@ -205,15 +221,62 @@ public class MainActivity extends AppCompatActivity {
                                 String days_string = separated[2];
                                 String am_pm = separated[separated.length - 1];
                                 String time = separated[separated.length - 2];
+                                String[] all_days = {getString(R.string.Saturday), getString(R.string.Sunday), getString(R.string.Monday), getString(R.string.Tuesday), getString(R.string.Wednesday), getString(R.string.Thursday), getString(R.string.Friday)};
                                 separated = time.split(":");
                                 if (am_pm == getText(R.string.am)) {
                                     helper.insertMedicineTime(separated[0], separated[1], days_string);
+                                    for (int j = 0; j < 7; j++) {
+                                        if (days_string.equals(all_days[j])) {
+                                            long timeinsec;
+                                            Calendar calendar = Calendar.getInstance();
+                                            if (j != 0) {
+                                                calendar.set(Calendar.DAY_OF_WEEK, j);
+                                            }
+                                            else {
+                                                calendar.set(Calendar.DAY_OF_WEEK, 7);
+                                            }
+                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(separated[0]));
+                                            calendar.set(Calendar.MINUTE, Integer.parseInt(separated[1]));
+                                            Intent intent = new Intent(this, AlarmReceiver.class);
+                                            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                                            timeinsec = (calendar.getTimeInMillis() - (calendar.getTimeInMillis() % 60000));
+                                            long selectedTimestamp =  timeinsec;
+                                            Cursor cursor = helper.getLast();
+                                            cursor.moveToLast();
+                                            int index = cursor.getColumnIndex("id");
+                                            new AlarmScheduler().setRepeatAlarm(getApplicationContext(), selectedTimestamp, AlarmManager.INTERVAL_DAY * 7);
+                                        }
+                                    }
+
                                 } else {
-                                    String hours = String.valueOf(Integer.parseInt(separated[0] + 12));
+                                    int hu = Integer.parseInt(separated[0]) + 12;
+                                    String hours = String.valueOf(hu);
                                     helper.insertMedicineTime(hours, separated[1], days_string);
+                                    for (int j = 0; j < 7; j++) {
+                                        if (days_string.equals(all_days[j])) {
+                                            long timeinsec;
+                                            Calendar calendar = Calendar.getInstance();
+                                            if (j != 0) {
+                                                calendar.set(Calendar.DAY_OF_WEEK, j);
+                                            }
+                                            else {
+                                                calendar.set(Calendar.DAY_OF_WEEK, 7);
+                                            }
+                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hours));
+                                            calendar.set(Calendar.MINUTE, Integer.parseInt(separated[1]));
+                                            Intent intent = new Intent(this, AlarmReceiver.class);
+                                            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                                            timeinsec = (calendar.getTimeInMillis() - (calendar.getTimeInMillis() % 60000));
+                                            long selectedTimestamp =  timeinsec;
+                                            Cursor cursor = helper.getLast();
+                                            cursor.moveToLast();
+                                            int index = cursor.getColumnIndex("id");
+                                            new AlarmScheduler().setRepeatAlarm(getApplicationContext(), selectedTimestamp, AlarmManager.INTERVAL_DAY * 7);
+                                        }
+                                    }
                                 }
                             }
-                            Navigation.findNavController(view).navigate(R.id.homeScreen);
+                            Navigation.findNavController(view).navigate(R.id.medicine_list);
                         }
                     }
                 } else {
@@ -247,8 +310,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         editText.setMaxLines(1);
         editText.setLines(1);
-        editText.setHintTextColor(Color.rgb(185, 185, 185));
-        editText.setTextColor(Color.BLACK);
+        editText.setHintTextColor(Color.rgb(117, 117, 117));
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setSingleLine(true);
         editText.addTextChangedListener(new TextWatcher() {
@@ -273,8 +335,8 @@ public class MainActivity extends AppCompatActivity {
                         Button button = new Button(getApplicationContext());
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + i);
-                        button.setBackgroundColor(Color.rgb(90, 90, 92));
-                        button.setTextColor(Color.BLACK);
+                        button.setBackgroundColor(Color.rgb(98, 0, 237));
+                        button.setTextColor(Color.WHITE);
                         button.setPadding(40, 0, 40, 0);
                         button.setText(getString(R.string.pill_time) + " " + i);
                         int finalI = i;
@@ -291,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                                     button.setText(getString(R.string.pill) + " " + finalI + " " + selectedHour + ":" + selectedMinute + " " + getString(R.string.am));
                                 }
 
-                            }, hour, minute, false);//Yes 24 hour time
+                            }, hour, minute, false);
                             mTimePicker.setTitle("Select Time");
                             mTimePicker.show();
                         });
@@ -331,8 +393,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         editText.setMaxLines(1);
         editText.setLines(1);
-        editText.setHintTextColor(Color.rgb(185, 185, 185));
-        editText.setTextColor(Color.BLACK);
+        editText.setHintTextColor(Color.rgb(117, 117, 117));
         editText.addTextChangedListener(new TextWatcher() {
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -370,8 +431,8 @@ public class MainActivity extends AppCompatActivity {
                         Button button = new Button(getApplicationContext());
                         button.setId(View.generateViewId());
                         button.setTag("edittext" + "n" + getString(hint2) + i);
-                        button.setBackgroundColor(Color.rgb(90, 90, 92));
-                        button.setTextColor(Color.BLACK);
+                        button.setBackgroundColor(Color.rgb(98, 0, 237));
+                        button.setTextColor(Color.WHITE);
                         button.setText(getString(R.string.pill_time) + " " + i + " " + getString(R.string.day) + " " + getString(hint2));
                         int finalI = i;
                         button.setOnClickListener(v -> {
@@ -495,5 +556,4 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
 }

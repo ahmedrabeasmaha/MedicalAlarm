@@ -25,7 +25,7 @@ public class myAdapter extends ArrayAdapter<Model> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Model current = getItem(position);
         ViewHolder viewHolder = new ViewHolder();
-        convertView = LayoutInflater.from(getContext()).inflate(R.layout.listviewactivty, parent, false);
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_activty, parent, false);
         viewHolder.text = convertView.findViewById(R.id.listview_item_title);
         viewHolder.image = convertView.findViewById(R.id.listview_image);
         convertView.setTag(viewHolder);

@@ -1,20 +1,13 @@
 package com.example.medicinealarm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 public class myDbAdapter extends SQLiteOpenHelper {
-
     public static final String DATABASE_NAME = "Medicine_Table.db";
 
 
@@ -26,14 +19,8 @@ public class myDbAdapter extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
         try {
-            db.execSQL(
-                    "create table medicine " +
-                            "(id integer not null primary key AUTOINCREMENT, medicine_name text, image blob, same_time boolean)"
-            );
-            db.execSQL(
-                    "create table medicine_time " +
-                            "(id integer primary key AUTOINCREMENT, alarm_hour text, alarm_minute text, day text, medicine_num integer not null, foreign key (medicine_num) REFERENCES medicine(id) on delete cascade)"
-            );
+            db.execSQL("create table medicine (id integer not null primary key AUTOINCREMENT, medicine_name text, image blob, same_time boolean)");
+            db.execSQL("create table medicine_time (id integer primary key AUTOINCREMENT, alarm_hour text, alarm_minute text, day text, medicine_num integer not null, foreign key (medicine_num) REFERENCES medicine(id) on delete cascade)");
         } catch (SQLException ignored) {
         }
     }
@@ -74,6 +61,24 @@ public class myDbAdapter extends SQLiteOpenHelper {
         return res;
     }
 
+    public Cursor getLast() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from medicine_time", null);
+        return res;
+    }
+
+    public Cursor getMedicineTime(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from medicine_time where medicine_num="+id+"", null);
+        return res;
+    }
+
+    public Cursor getNotify(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from medicine where id="+id+"", null);
+        return res;
+    }
+
     public boolean updateData(Integer id, String name, String phone, String email, String street, String place) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -86,12 +91,17 @@ public class myDbAdapter extends SQLiteOpenHelper {
         return true;
     }
 
-    public Integer deleteContact(Integer id) {
+    public Integer deleteMedicine(Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete("medicine",
                 "id = ? ",
                 new String[]{Integer.toString(id)});
     }
 
-
+    public Integer deleteTime(Integer id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("medicine_time",
+                "medicine_num = ? ",
+                new String[]{Integer.toString(id)});
+    }
 }

@@ -5,38 +5,53 @@ import android.app.AlertDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.work.Data;
+import androidx.navigation.Navigation;
 
-import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-public class HomeScreen extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link medicine_list#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class medicine_list extends Fragment {
 
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    public HomeScreen() {
+    public medicine_list() {
+        // Required empty public constructor
     }
 
-    public static HomeScreen newInstance(String param1, String param2) {
-        HomeScreen fragment = new HomeScreen();
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment medicine_list.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static medicine_list newInstance(String param1, String param2) {
+        medicine_list fragment = new medicine_list();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -47,17 +62,17 @@ public class HomeScreen extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
+    @SuppressLint("Range")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home_screen, container, false);
+        View view = inflater.inflate(R.layout.fragment_medicine_list, container, false);
         myDbAdapter helper = new myDbAdapter(getContext());
         Cursor cursor = helper.getData();
         ListView listView = view.findViewById(R.id.listView1);
@@ -92,7 +107,8 @@ public class HomeScreen extends Fragment {
             alert.setMessage(getText(R.string.delete));
             alert.setCancelable(true);
             alert.setPositiveButton(getText(R.string.yes), (dialog, id) -> {
-                helper.deleteContact(Integer.parseInt(String.valueOf(viewed.findViewById(R.id.listview_item_title).getTag())));
+                helper.deleteMedicine(Integer.parseInt(String.valueOf(viewed.findViewById(R.id.listview_item_title).getTag())));
+                helper.deleteTime(Integer.parseInt(String.valueOf(viewed.findViewById(R.id.listview_item_title).getTag())));
                 Cursor cursor1 = helper.getData();
                 List<Model> list1 = new ArrayList<>();
                 try {
@@ -126,6 +142,14 @@ public class HomeScreen extends Fragment {
             dialog.show();
             return true;
         });
+//        listView.setOnItemClickListener((parent, viewed, position, id) -> {
+//            Cursor cursor2 = helper.getNotify(Integer.parseInt(String.valueOf(viewed.findViewById(R.id.listview_item_title).getTag())));
+//            EditText editText = getContext().findViewById(R.id.textInputEditText);
+//            cursor2.moveToFirst();
+//            editText.setText("dvdsv");
+//            Navigation.findNavController(viewed).navigate(R.id.add_medicine);
+//
+//        });
         return view;
     }
 }

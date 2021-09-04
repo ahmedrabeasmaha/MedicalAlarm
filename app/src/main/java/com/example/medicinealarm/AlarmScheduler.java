@@ -3,23 +3,9 @@ package com.example.medicinealarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 
-/**
- * Created by delaroy on 9/22/17.
- */
-
 public class AlarmScheduler {
-
-    /**
-     * Schedule a reminder alarm at the specified time for the given task.
-     *
-     * @param context Local application or activity context
-
-//     * @param reminderTask Uri referencing the task in the content provider
-     */
-
     public void setAlarm(Context context, long alarmTime) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
@@ -42,7 +28,7 @@ public class AlarmScheduler {
         }
     }
 
-    public void setRepeatAlarm(Context context, long alarmTime, Uri reminderTask, long RepeatTime) {
+    public void setRepeatAlarm(Context context, long alarmTime, long RepeatTime) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
         PendingIntent operation =
@@ -53,7 +39,7 @@ public class AlarmScheduler {
 
     }
 
-    public void cancelAlarm(Context context, Uri reminderTask) {
+    public void cancelAlarm(Context context) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
         PendingIntent operation =
@@ -62,5 +48,4 @@ public class AlarmScheduler {
         manager.cancel(operation);
 
     }
-
 }
